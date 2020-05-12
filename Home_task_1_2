@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[32]:
+
+
+import pandas as pd
+
+
+# # Задание 1
+
+# In[33]:
+
+
+authors = pd.DataFrame({'author_id': [1, 2, 3], 'author_name': ['Тургенев', 'Чехов', 'Островский']}, columns = ['author_id', 'author_name'])
+authors
+
+
+# In[34]:
+
+
+book = pd.DataFrame({'author_id': [1, 1, 1, 2, 2, 3, 3], 'book_title': ['Отцы и дети', 'Рудин', 'Дворянское гнездо', 'Толстый и тонкий', 'Дама с собачкой', 'Гроза', 'Таланты и поклонники'], 'price': [450, 300, 350, 500, 450, 370, 290]}, columns = ['author_id', 'book_title', 'price'])
+book
+
+
+# # Задание 2
+
+# In[35]:
+
+
+authors_price = pd.merge(authors, book, on = 'author_id', how = 'outer')
+authors_price
+
+
+# # Задание 3
+
+# In[36]:
+
+
+top5 = authors_price.nlargest(5, 'price')
+top5
+
+
+# # Задание 4
+
+# In[37]:
+
+
+authors_max = authors_price.groupby('author_name').agg({'price': 'max'}).rename(columns = {'price': 'max_price'})
+
+authors_min = authors_price.groupby('author_name').agg({'price': 'min'}).rename(columns = {'price': 'min_price'})
+
+authors_mean = authors_price.groupby('author_name').agg({'price': 'mean'}).rename(columns = {'price': 'mean_price'}).astype(int)
+
+
+# In[38]:
+
+
+authors_stat = pd.concat([authors_max, authors_min, authors_mean], axis = 1)
+authors_stat
+
+
+# # Задание 5
+
+# In[44]:
+
+
+authors_price['cover'] = ['твердая', 'мягкая', 'мягкая', 'твердая', 'твердая', 'мягкая', 'мягкая']
+authors_price
+
+
+# In[55]:
+
+
+book_info = authors_price.pivot_table(index = ['author_name'], columns=['cover'], values='price', aggfunc='sum')
+
+
+# In[60]:
+
+
+authors_price
+
+
+# In[61]:
+
+
+book_info.fillna(0)
+
+
+# In[74]:
+
+
+book_info.to_pickle('book_info.pkl')
+
+
+# In[76]:
+
+
+book_info2 = pd.read_pickle('book_info.pkl')
+
+
+# In[77]:
+
+
+book_info2
+
